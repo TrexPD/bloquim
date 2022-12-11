@@ -8,8 +8,8 @@ def sobre_app():
 Esse programa foi criado por Paulo Daniel!
 
 
-Versão:     0.0.5
-Licensa:    MIT
+Versão:     0.1.0
+Licensa:    GNU General Public License v3.0
 Github:      https://github.com/TrexPD
         """,
         title='Sobre o bloquim!',
