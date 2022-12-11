@@ -9,7 +9,7 @@ Esse programa foi criado por Paulo Daniel!
 
 
 Versão:     0.1.0
-Licensa:    GNU General Public License v3.0
+Licença:    GNU General Public License v3.0
 Github:      https://github.com/TrexPD
         """,
         title='Sobre o bloquim!',
