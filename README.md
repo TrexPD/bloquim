@@ -12,7 +12,8 @@
 
 ## **Em Breve**
 
-#### Essa é uma versão beta, em construção!
+
+#### Essa é uma versão beta, <b> em construção </b>!
 
 <h2 align="center">
     <strong>🌟
