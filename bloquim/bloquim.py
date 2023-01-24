@@ -1,9 +1,8 @@
 import PySimpleGUI as sg
 from datetime import datetime
-from help import sobre_app
-from rich.syntax import Syntax
-from rich.console import Console
+from ajuda import info_app
 from pathlib import Path
+from visualizar import sumario
 
 
 
@@ -25,20 +24,20 @@ hora_data: str =         "Hora e data atual"
 maiuscula: str =         "Converter para MAIÚSCULAS"
 minuscula: str =         "Converter para minúsculas"
 p_letra_maiuscula: str = "Converter 1° letra para maiúsculo"
-sobre: str =             "Sobre"
+sobre_app: str =             "Sobre"
 exit: str =              "Sair"
+sumario_do_arquivo: str =           "Sumário do arquivo"
 
 
-
-# menu de cabeçalho!
+# Configuração do Menu de Cabeçalho!
 menu_layout = (
     ["Arquivo", [file_new, file_open, file_save, file_save_as, "---", file_print, "---", exit]],
     ["Editar", ['Inserir', [hora_data], 'Converter letras para...', [maiuscula, minuscula, p_letra_maiuscula]]],
-    ['Visualizar', ['Sumário do arquivo']],
-    ["Ajuda", [sobre]])
+    ['Visualizar', [sumario_do_arquivo]],
+    ["Ajuda", [sobre_app]])
 
 
-# layout de configuração
+# Configuração do Layout do App!
 layout = [
     [sg.Menu(menu_layout, background_color='#424556', text_color='white', font=('futura', 9))],
     [sg.Multiline(
@@ -58,7 +57,7 @@ layout = [
 
 # Janela principal
 window = sg.Window(
-    title = f"{new_file_name[:-4]} - Bloquim",
+    title = new_file_name,
     layout = layout,
     margins = (0, 0),
     resizable = True,
@@ -72,7 +71,9 @@ window = sg.Window(
 window.read(timeout=1)
 window["body_main"].expand(expand_x=True, expand_y=True)
 
-# cria um novo arquivo de texto!
+# ---------------------- Gerenciar arquivo --------------------------------
+
+# Cria um novo arquivo de texto!
 def new_file() -> str:
     if len(values['body_main']) > 0: 
         if sg.popup_yes_no('Você não salvou as alterações do arquivo, tem certeza que deseja criar um novo?', 
@@ -82,7 +83,7 @@ def new_file() -> str:
     filename = new_file_name
     return filename
 
-
+# Abre qualquer arquivo de texto!
 def open_file() -> str:
     try:
         file_name: str = sg.popup_get_file("Open File", 
@@ -105,14 +106,12 @@ icon='.\\resources\\image\\bloco-de-anotacoes.ico', auto_close=True, no_titlebar
         else:
             return file_name
 
-
 # Salva o arquivo como '.txt' por padrão!
 def save_file(file_name: str):
     if (len(values['body_main']) > 0) and file_name not in (None, ""):
         with open(file_name, "wt", encoding='utf-8') as file:
             file.write(values.get("body_main"))
             return file_name
-
 
 # Salva o arquivo com nome e formato que você quiser!
 def save_file_as() -> str:
@@ -144,6 +143,8 @@ def tornar_caixa_baixa():
 def tornar_1_letra_caixa_alta():
     return window["body_main"].update(value=str(values["body_main"]).capitalize())
 
+
+# ----------------------- Capiturando os valores é os events ---------------------------
 
 while True:
     event, values = window.read()    
@@ -177,5 +178,7 @@ while True:
         tornar_caixa_baixa()
     if event == (p_letra_maiuscula):
         tornar_1_letra_caixa_alta()
-    if event == sobre:
-        sobre_app()
+    if event == (sumario_do_arquivo):
+        sumario(values["body_main"])
+    if event == (sobre_app):
+        info_app()
