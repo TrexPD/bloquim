@@ -1,6 +1,6 @@
 import PySimpleGUI as sg
 from re import findall, sub
-
+from pathlib import Path
 
 
 class Summary:
@@ -47,5 +47,5 @@ Quantidade de palavras:           {summary.amount_of_words()}
         background_color = '#424556',
         button_type=5,
         font=('Futura', 15),
-        icon='.\\resources\\image\\bloco-de-anotacoes.ico'
+        icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico')
 )
