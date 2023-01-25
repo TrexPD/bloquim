@@ -63,7 +63,7 @@ window = sg.Window(
     resizable = True,
     return_keyboard_events = True,
     enable_close_attempted_event = True,
-    icon = '.\\resources\\image\\bloco-de-anotacoes.ico'
+    icon = Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico')
 )
 
 
@@ -78,7 +78,7 @@ def new_file() -> str:
     if len(values['body_main']) > 0: 
         if sg.popup_yes_no('Você não salvou as alterações do arquivo, tem certeza que deseja criar um novo?', 
         title="Aviso do bloquim!", button_color='#333645', background_color='#424556',
-        icon='.\\resources\\image\\bloco-de-anotacoes.ico') == 'Yes':
+        icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico')) == 'Yes':
             window["body_main"].update(value="")
     filename = new_file_name
     return filename
@@ -87,7 +87,7 @@ def new_file() -> str:
 def open_file() -> str:
     try:
         file_name: str = sg.popup_get_file("Open File", 
-        no_window=True, icon='.\\resources\\image\\bloco-de-anotacoes.ico')
+        no_window=True, icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico'))
     except:
         return 'Erro ao abrir o arquivo! :('
     else:
@@ -100,7 +100,7 @@ def open_file() -> str:
 
 O arquivo que você quer abrir é incompativél!""", 
 grab_anywhere=True, background_color = 'black', button_type=5, font='Futura',
-icon='.\\resources\\image\\bloco-de-anotacoes.ico', auto_close=True, no_titlebar=True)           
+icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico'), auto_close=True, no_titlebar=True)           
         except FileNotFoundError:
             return new_file_name
         else:
@@ -109,19 +109,26 @@ icon='.\\resources\\image\\bloco-de-anotacoes.ico', auto_close=True, no_titlebar
 # Salva o arquivo como '.txt' por padrão!
 def save_file(file_name: str):
     if (len(values['body_main']) > 0) and file_name not in (None, ""):
-        with open(file_name, "wt", encoding='utf-8') as file:
+        path = Path(Path().home(), 'Downloads', file_name)
+        with open(path, "wt", encoding='utf-8') as file:
             file.write(values.get("body_main"))
-            return file_name
+            return path
+    else:
+        return new_file_name
 
 # Salva o arquivo com nome e formato que você quiser!
 def save_file_as() -> str:
     try:
         file_name: str = sg.popup_get_file("Open File", no_window=True, 
-        icon='.\\resources\\image\\bloco-de-anotacoes.ico', save_as=True)
+        icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico'), save_as=True)
     except:
         return 'Arquivo incompativél, tente outro arquivo!'
     else:
         if (len(values['body_main']) > 0) and (file_name not in (None, "")):
+            if Path(file_name).suffix:
+                pass
+            else:
+                file_name = Path(file_name + '.txt')
             with open(file_name, "wt", encoding='utf-8') as file:
                 file.write(values.get("body_main"))
                 return file_name
@@ -152,7 +159,7 @@ while True:
     if (event == sg.WINDOW_CLOSE_ATTEMPTED_EVENT or event == exit):
         if len(values['body_main']) > 0:     
             if sg.popup_yes_no('Você não salvou as alterações do arquivo, tem certeza que deseja sair?',
-        title="Aviso do bloquim!", button_color='#333645', icon='.\\resources\\image\\bloco-de-anotacoes.ico', 
+        title="Aviso do bloquim!", button_color='#333645', icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico'), 
         background_color = '#424556') == 'Yes':
                 break
         else:
