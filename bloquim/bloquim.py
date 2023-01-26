@@ -3,6 +3,7 @@ from datetime import datetime
 from ajuda import info_app
 from pathlib import Path
 from visualizar import sumario
+from pyperclip import copy, paste
 
 
 
@@ -14,19 +15,19 @@ WIN_W = 60
 WIN_H = 30
 
 
-new_file_name: str =     "Documento de texto.txt"
-file_new: str =          "Novo arquivo           Ctrl + N"
-file_open: str =         "Abrir arquivo            Ctrl + O"
-file_save: str =         "Salvar arquivo         Ctrl + S"
-file_save_as: str =      "Salvar arquivo como..."
-file_print: str =        "Imprimir arquivo        Ctrl + P"
-hora_data: str =         "Hora e data atual"
-maiuscula: str =         "Converter para MAIÚSCULAS"
-minuscula: str =         "Converter para minúsculas"
-p_letra_maiuscula: str = "Converter 1° letra para maiúsculo"
-sobre_app: str =             "Sobre"
-exit: str =              "Sair"
-sumario_do_arquivo: str =           "Sumário do arquivo"
+new_file_name: str =       "Documento de texto.txt"
+file_new: str =            "Novo arquivo           Ctrl + N"
+file_open: str =           "Abrir arquivo            Ctrl + O"
+file_save: str =           "Salvar arquivo         Ctrl + S"
+file_save_as: str =        "Salvar arquivo como..."
+file_print: str =          "Imprimir arquivo        Ctrl + P"
+hora_data: str =           "Hora e data atual"
+maiuscula: str =           "Converter para MAIÚSCULAS"
+minuscula: str =           "Converter para minúsculas"
+p_letra_maiuscula: str =   "Converter 1° letra para maiúsculo"
+sumario_do_arquivo: str =  "Sumário do arquivo"
+sobre_app: str =           "Sobre"
+exit: str =                "Sair"
 
 
 # Configuração do Menu de Cabeçalho!
@@ -41,7 +42,7 @@ menu_layout = (
 layout = [
     [sg.Menu(menu_layout, background_color='#424556', text_color='white', font=('futura', 9))],
     [sg.Multiline(
-    font="Futura",
+    font="Consola",
     text_color="white",
     size=(WIN_W, WIN_H),
     key="body_main",
@@ -63,7 +64,7 @@ window = sg.Window(
     resizable = True,
     return_keyboard_events = True,
     enable_close_attempted_event = True,
-    icon = Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico')
+    icon = Path('resources', 'image', 'bloco-de-anotacoes.ico')
 )
 
 
@@ -78,7 +79,7 @@ def new_file() -> str:
     if len(values['body_main']) > 0: 
         if sg.popup_yes_no('Você não salvou as alterações do arquivo, tem certeza que deseja criar um novo?', 
         title="Aviso do bloquim!", button_color='#333645', background_color='#424556',
-        icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico')) == 'Yes':
+        icon=Path('resources', 'image', 'bloco-de-anotacoes.ico')) == 'Yes':
             window["body_main"].update(value="")
     filename = new_file_name
     return filename
@@ -87,7 +88,7 @@ def new_file() -> str:
 def open_file() -> str:
     try:
         file_name: str = sg.popup_get_file("Open File", 
-        no_window=True, icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico'))
+        no_window=True, icon=Path('resources', 'image', 'bloco-de-anotacoes.ico'))
     except:
         return 'Erro ao abrir o arquivo! :('
     else:
@@ -100,7 +101,7 @@ def open_file() -> str:
 
 O arquivo que você quer abrir é incompativél!""", 
 grab_anywhere=True, background_color = 'black', button_type=5, font='Futura',
-icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico'), auto_close=True, no_titlebar=True)           
+icon=Path('image', 'bloco-de-anotacoes.ico'), auto_close=True, no_titlebar=True)           
         except FileNotFoundError:
             return new_file_name
         else:
@@ -120,7 +121,7 @@ def save_file(file_name: str):
 def save_file_as() -> str:
     try:
         file_name: str = sg.popup_get_file("Open File", no_window=True, 
-        icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico'), save_as=True)
+        icon=Path('resources', 'image', 'bloco-de-anotacoes.ico'), save_as=True)
     except:
         return 'Arquivo incompativél, tente outro arquivo!'
     else:
@@ -138,6 +139,7 @@ def save_file_as() -> str:
 #------------------------ EDITAR OPÇÕES ---------------------------------
 
 # Insere a data e hora atual
+
 def inserir_hora_data():
     return window["body_main"].update(value=str(values["body_main"]) + str(datetime.now()))
 
@@ -151,41 +153,60 @@ def tornar_1_letra_caixa_alta():
     return window["body_main"].update(value=str(values["body_main"]).capitalize())
 
 
+#------------------------ Atalhos do teclado ---------------------------------
+
+window.bind("<Control-n>", f"{file_new}")
+window.bind("<Control-o>", f"{file_open}")
+window.bind("<Control-s>", f"{file_save}")
+window.bind("<Control-p>", f"{file_print}")
+window.bind("<Control-r>", f"{sumario_do_arquivo}")
+window.bind("<Control-h>", f"{hora_data}")
+
+
 # ----------------------- Capiturando os valores é os events ---------------------------
 
 while True:
-    event, values = window.read()    
+    event, values = window.read(timeout=1)
 
     if (event == sg.WINDOW_CLOSE_ATTEMPTED_EVENT or event == exit):
         if len(values['body_main']) > 0:     
-            if sg.popup_yes_no('Você não salvou as alterações do arquivo, tem certeza que deseja sair?',
-        title="Aviso do bloquim!", button_color='#333645', icon=Path('bloquim', 'resources', 'image', 'bloco-de-anotacoes.ico'), 
-        background_color = '#424556') == 'Yes':
+            if sg.popup('Você não salvou as alterações do arquivo, tem certeza que deseja sair?',
+            title="Aviso do bloquim!", button_color='#333645', icon=Path('resources', 'image', 'bloco-de-anotacoes.ico'), 
+            background_color = '#424556') == 'Yes':
                 break
         else:
             break
-    if event in (file_new, "n:78"):
+
+    if event == file_new:
         window.set_title(new_file())
-    if event in (file_open, "o:79"):
+
+    if event == file_open:
         abrir: str = open_file()
         if abrir == '__TIMEOUT__':
             window.set_title(new_file_name)  
         else:
             window.set_title(abrir)
 
-    if event in (file_save, "s:83"):
+    if event == file_save:
         window.set_title(save_file(new_file_name))
-    if event == (file_save_as):
+
+    if event == file_save_as:
         window.set_title(save_file_as())
-    if event == (hora_data):
+
+    if event == hora_data:
         inserir_hora_data()
-    if event == (maiuscula):
+
+    if event == maiuscula:
         tornar_caixa_alta()
-    if event == (minuscula):
+
+    if event == minuscula:
         tornar_caixa_baixa()
-    if event == (p_letra_maiuscula):
+
+    if event == p_letra_maiuscula:
         tornar_1_letra_caixa_alta()
-    if event == (sumario_do_arquivo):
+
+    if event == sumario_do_arquivo:
         sumario(values["body_main"])
-    if event == (sobre_app):
+
+    if event == sobre_app:
         info_app()
