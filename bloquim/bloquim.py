@@ -3,8 +3,7 @@ from datetime import datetime
 from ajuda import info_app
 from pathlib import Path
 from visualizar import sumario
-from pyperclip import copy, paste
-
+from pyperclip import copy
 
 
 # Escolha de temas
@@ -16,16 +15,17 @@ WIN_H = 30
 
 
 new_file_name: str =       "Documento de texto.txt"
-file_new: str =            "Novo arquivo           Ctrl + N"
-file_open: str =           "Abrir arquivo            Ctrl + O"
-file_save: str =           "Salvar arquivo         Ctrl + S"
+file_new: str =            "Novo arquivo                Ctrl + N"
+file_open: str =           "Abrir arquivo                 Ctrl + O"
+file_save: str =           "Salvar arquivo              Ctrl + S"
 file_save_as: str =        "Salvar arquivo como..."
-file_print: str =          "Imprimir arquivo        Ctrl + P"
-hora_data: str =           "Hora e data atual"
+file_print: str =          "Imprimir arquivo          Ctrl + P"
+hora_data: str =           "Hora e data atual        Ctrl + H"
+caminho: str =             "Copiar 'path' completo do arquivo!"
 maiuscula: str =           "Converter para MAIÚSCULAS"
 minuscula: str =           "Converter para minúsculas"
 p_letra_maiuscula: str =   "Converter 1° letra para maiúsculo"
-sumario_do_arquivo: str =  "Sumário do arquivo"
+sumario_do_arquivo: str =  "Sumário do arquivo          Crtl + R"
 sobre_app: str =           "Sobre"
 exit: str =                "Sair"
 
@@ -33,7 +33,7 @@ exit: str =                "Sair"
 # Configuração do Menu de Cabeçalho!
 menu_layout = (
     ["Arquivo", [file_new, file_open, file_save, file_save_as, "---", file_print, "---", exit]],
-    ["Editar", ['Inserir', [hora_data], 'Converter letras para...', [maiuscula, minuscula, p_letra_maiuscula]]],
+    ["Editar", [caminho, "---", 'Inserir', [hora_data], 'Converter letras para...', [maiuscula, minuscula, p_letra_maiuscula]]],
     ['Visualizar', [sumario_do_arquivo]],
     ["Ajuda", [sobre_app]])
 
@@ -138,8 +138,11 @@ def save_file_as() -> str:
 
 #------------------------ EDITAR OPÇÕES ---------------------------------
 
-# Insere a data e hora atual
 
+def path_completo():
+    return copy(str(Path(__file__)))
+
+# Insere a data e hora atual
 def inserir_hora_data():
     return window["body_main"].update(value=str(values["body_main"]) + str(datetime.now()))
 
@@ -170,13 +173,13 @@ while True:
 
     if (event == sg.WINDOW_CLOSE_ATTEMPTED_EVENT or event == exit):
         if len(values['body_main']) > 0:     
-            if sg.popup('Você não salvou as alterações do arquivo, tem certeza que deseja sair?',
+            if sg.popup_ok_cancel('Você não salvou as alterações do arquivo, tem certeza que deseja sair?',
             title="Aviso do bloquim!", button_color='#333645', icon=Path('resources', 'image', 'bloco-de-anotacoes.ico'), 
-            background_color = '#424556') == 'Yes':
+            background_color = '#424556') == 'OK':
                 break
         else:
             break
-
+    
     if event == file_new:
         window.set_title(new_file())
 
@@ -192,7 +195,10 @@ while True:
 
     if event == file_save_as:
         window.set_title(save_file_as())
-
+    
+    if event == caminho:
+        path_completo()
+    
     if event == hora_data:
         inserir_hora_data()
 
