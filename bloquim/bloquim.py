@@ -76,16 +76,17 @@ window["body_main"].expand(expand_x=True, expand_y=True)
 
 # Cria um novo arquivo de texto!
 def new_file() -> str:
-    if len(values['body_main']) > 0: 
-        if sg.popup_yes_no('Você não salvou as alterações do arquivo, tem certeza que deseja criar um novo?', 
-        title="Aviso do bloquim!", button_color='#333645', background_color='#424556',
-        icon=Path('resources', 'image', 'bloco-de-anotacoes.ico')) == 'Yes':
+    if (str(values['body_main']) != str(open_list[1])) and (len(values['body_main']) != open_list[1]):
+        if sg.popup_ok_cancel('Você não salvou as alterações do arquivo, tem certeza que deseja sair?',
+            title="Aviso do bloquim!", button_color='#333645', icon=Path('resources', 'image', 'bloco-de-anotacoes.ico'), 
+            background_color = '#424556') == 'OK':
             window["body_main"].update(value="")
-    filename = new_file_name
-    return filename
+    else:
+        window["body_main"].update(value="")
+    return [new_file_name, 0]
 
 # Abre qualquer arquivo de texto!
-def open_file() -> str:
+def open_file() -> list:
     try:
         file_name: str = sg.popup_get_file("Open File", 
         no_window=True, icon=Path('resources', 'image', 'bloco-de-anotacoes.ico'))
@@ -94,7 +95,8 @@ def open_file() -> str:
     else:
         try:
             with open(file_name, "rt", encoding='utf-8') as file:
-                window["body_main"].update(value=file.read())
+                content = file.read(4096)
+                window["body_main"].update(value=content)
         except UnicodeDecodeError:
             return sg.Popup("""
                                 Aviso!
@@ -105,15 +107,18 @@ icon=Path('image', 'bloco-de-anotacoes.ico'), auto_close=True, no_titlebar=True)
         except FileNotFoundError:
             return new_file_name
         else:
-            return file_name
+            return [file_name, content]
 
 # Salva o arquivo como '.txt' por padrão!
-def save_file(file_name: str):
+def save_file(file_name: str = new_file_name):
     if (len(values['body_main']) > 0) and file_name not in (None, ""):
-        path = Path(Path().home(), 'Downloads', file_name)
+        if Path(file_name).exists():
+            path = file_name
+        else:
+            path = Path(Path().home(), 'Downloads', file_name)
         with open(path, "wt", encoding='utf-8') as file:
-            file.write(values.get("body_main"))
-            return path
+            content = file.write(values["body_main"])
+            return [path, content]
     else:
         return new_file_name
 
@@ -125,16 +130,14 @@ def save_file_as() -> str:
     except:
         return 'Arquivo incompativél, tente outro arquivo!'
     else:
-        if (len(values['body_main']) > 0) and (file_name not in (None, "")):
-            if Path(file_name).suffix:
-                pass
-            else:
-                file_name = Path(file_name + '.txt')
-            with open(file_name, "wt", encoding='utf-8') as file:
-                file.write(values.get("body_main"))
-                return file_name
+        if Path(file_name).suffix:
+            pass
         else:
-            return new_file_name
+            file_name = Path(file_name + '.txt')
+        with open(file_name, "wt", encoding='utf-8') as file:
+            content = file.write(values["body_main"])
+            return [file_name, content]
+
 
 #------------------------ EDITAR OPÇÕES ---------------------------------
 
@@ -165,36 +168,32 @@ window.bind("<Control-p>", f"{file_print}")
 window.bind("<Control-r>", f"{sumario_do_arquivo}")
 window.bind("<Control-h>", f"{hora_data}")
 
-
 # ----------------------- Capiturando os valores é os events ---------------------------
-
+open_list: list = ['', 0]
 while True:
     event, values = window.read(timeout=1)
-
-    if (event == sg.WINDOW_CLOSE_ATTEMPTED_EVENT or event == exit):
-        if len(values['body_main']) > 0:     
-            if sg.popup_ok_cancel('Você não salvou as alterações do arquivo, tem certeza que deseja sair?',
-            title="Aviso do bloquim!", button_color='#333645', icon=Path('resources', 'image', 'bloco-de-anotacoes.ico'), 
-            background_color = '#424556') == 'OK':
-                break
-        else:
-            break
     
     if event == file_new:
-        window.set_title(new_file())
+        open_list = new_file()
+        window.set_title(open_list[0])
 
     if event == file_open:
-        abrir: str = open_file()
-        if abrir == '__TIMEOUT__':
+        open_list: list = open_file()
+        if open_list[0] == '__TIMEOUT__':
             window.set_title(new_file_name)  
         else:
-            window.set_title(abrir)
+            window.set_title(open_list[0])
 
     if event == file_save:
-        window.set_title(save_file(new_file_name))
+        if open_list[0]:
+            open_list: list = save_file(open_list[0])
+            window.set_title(open_list[0])
+        else:
+            open_list = save_file()
 
     if event == file_save_as:
-        window.set_title(save_file_as())
+        open_list = save_file_as()
+        window.set_title(open_list[0])
     
     if event == caminho:
         path_completo()
@@ -216,3 +215,12 @@ while True:
 
     if event == sobre_app:
         info_app()
+
+    if (event == sg.WINDOW_CLOSE_ATTEMPTED_EVENT or event == exit):
+        if (str(values['body_main']) != str(open_list[1])) and (len(values['body_main']) != open_list[1]):
+            if sg.popup_ok_cancel('Você não salvou as alterações do arquivo, tem certeza que deseja sair?',
+            title="Aviso do bloquim!", button_color='#333645', icon=Path('resources', 'image', 'bloco-de-anotacoes.ico'), 
+            background_color = '#424556') == 'OK':
+                break
+        else:
+            break
