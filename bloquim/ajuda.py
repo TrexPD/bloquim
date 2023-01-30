@@ -9,7 +9,7 @@ def info_app():
 Esse programa foi criado por Paulo Daniel!
 
 
-Versão:     0.1.5
+Versão:     0.2.1
 Licença:    GNU General Public License v3.0
 Github:      https://github.com/TrexPD/bloquim
         """,
