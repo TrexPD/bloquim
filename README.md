@@ -6,6 +6,7 @@
 
 ```PySimpleGUI```
 ```Datetime```
+```Pathlib```
 
 ### Uso na prática:
 
